@@ -41,7 +41,7 @@ Como observable se utiliza la media de los operadores `Z` sobre todos los qubits
 
 La función de coste añade al MSE un término de *ranking* por pares, vectorizado con `np.triu_indices`, que penaliza las predicciones que invierten el orden esperado en `NH → z`. El peso relativo viene dado por la constante `LAMBDA_NH` al inicio del script (`0.05` por defecto; con `0.0` se recupera el MSE puro).
 
-La validación se realiza por *cross-validation* repetido `10 × 10`, con búsqueda adaptativa del número de capas óptimo entre `LAYERS_MIN` y `LAYERS_MAX` y una paciencia de 1.
+La validación se realiza por *cross-validation* repetido `100 × 10`, con búsqueda adaptativa del número de capas óptimo entre `LAYERS_MIN` y `LAYERS_MAX` y una paciencia de 2.
 
 
 ## Requisitos e instalación
@@ -69,7 +69,7 @@ El segundo paso es el entrenamiento del modelo cuántico:
 python Circuito_cuantico.py
 ```
 
-Conviene tener en cuenta que el tiempo de ejecución no es despreciable: escala con `LAYERS_MAX × N_REPEATS_CV × N_FOLDS_CV` y, aunque el script paraleliza los *folds* mediante `joblib` (`N_JOBS = -1` por defecto), una ejecución completa en una máquina sin GPU puede llevar varias horas. Al finalizar se generan tres CSV de resultados (`vqr7q_layers_summary.csv`, `vqr7q_cv_detail.csv`, `vqr7q_predictions.csv`), un *log* completo de la ejecución (`vqr_su2_nh.log`) y ocho figuras de diagnóstico (curvas de entrenamiento, *scatter* y residuos del mejor *fold*, *boxplots* y *heatmap* por capa, y el diagnóstico físico NH→z).
+Conviene tener en cuenta que el tiempo de ejecución no es despreciable: escala con `LAYERS_MAX × N_REPEATS_CV × N_FOLDS_CV` y, aunque el script paraleliza los *folds* mediante `joblib` (`N_JOBS = -1` por defecto), una ejecución completa en una máquina sin GPU puede llevar varias horas. Al finalizar se generan tres CSV de resultados (`vqr7q_layers_summary.csv`, `vqr7q_cv_detail.csv`, `vqr7q_predictions.csv`), un *log* completo de la ejecución (`vqr_su2_nh.log`) y varias figuras de diagnóstico (curvas de entrenamiento, *scatter* y residuos del mejor *fold*, *boxplots* y *heatmap* por capa, diagnóstico físico NH→z, etc.). Los CSV de la ejecución de referencia utilizada en la memoria, junto con las figuras finales que produce `GRÁFICAS.ipynb`, se incluyen ya en el repositorio, de modo que el notebook de gráficas puede inspeccionarse sin necesidad de repetir antes el entrenamiento.
 
 El tercer paso es `GRAFÍCAS.ipynb`, que lee los CSV generados por el script y produce las figuras finales con el estilo de publicación que aparece en la memoria: distribuciones por capa en *violin plot*, *boxplots* de `r` y RMSE, *scatter* estilo Narendra con bandas 1σ y 2σ, y la distribución de residuos del modelo óptimo.
 
@@ -82,11 +82,11 @@ Los hiperparámetros relevantes están declarados como constantes al inicio de `
 N_QUBITS      = 7
 X_RANGE       = (0, np.pi)     # rango de codificación de las features
 MAXITER       = 150            # iteraciones máximas de L-BFGS-B por fold
-N_REPEATS_CV  = 10
+N_REPEATS_CV  = 100
 N_FOLDS_CV    = 10
 LAYERS_MIN    = 1
 LAYERS_MAX    = 6
-PATIENCE      = 1
+PATIENCE      = 2
 MIN_DELTA     = 0.005
 LAMBDA_NH     = 0.05           # peso del término NH-ranking (0 = MSE puro)
 N_JOBS        = -1
@@ -96,6 +96,16 @@ N_JOBS        = -1
 ## Reproducibilidad
 
 Todas las semillas están fijadas a 42: la inicialización de los parámetros del circuito (`np.random.default_rng(seed=42)`), la imputación MICE y los `KFold` de la *cross-validation*. Como el *backend* es de simulación exacta y no introduce ruido cuántico, una misma versión del código en un mismo entorno produce resultados deterministas.
+
+
+## Resultados
+
+La ejecución de referencia incluida en el repositorio se realizó con 100 repeticiones de validación cruzada de 10 *folds*, y la búsqueda adaptativa exploró tres profundidades antes de detenerse (L = 1, 2 y 3). El criterio estadístico, basado en la correlación media en *test*, seleccionó L = 1 como óptimo, con r_test medio de 0.60 (mediana 0.61), seguido de L = 2 (0.55) y L = 3 (0.53); el RMSE resulta prácticamente indistinguible entre L = 1 y L = 2, en torno a 1.10 en ambos casos. El *scatter* al estilo de Narendra y la distribución de residuos *out-of-fold* incluidos en la memoria se han generado con L = 2: sobre los 215 GRBs predichos se obtiene r = 0.567, σ = 1.10, RMS = 1.12, sesgo = −0.18 y NMAD = 1.06, con un 94 % de las predicciones dentro de 2σ y un 72 % dentro de 1σ del valor observado.
+
+
+## Uso de inteligencia artificial
+
+Para la implementación del programa principal (`Circuito_cuantico.py`) se ha utilizado el asistente de inteligencia artificial Claude (Anthropic) como herramienta de apoyo en tareas de programación, principalmente en la estructuración del código, la depuración y la optimización de fragmentos concretos. El planteamiento del problema, el diseño del modelo, la elección de la metodología y la interpretación de los resultados son responsabilidad exclusiva del autor.
 
 
 ## Autor
