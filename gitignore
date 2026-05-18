@@ -1,0 +1,70 @@
+# =============================================================
+# .gitignore — TFG VQR LGRBs
+# =============================================================
+
+# ─── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.Python
+build/
+dist/
+develop-eggs/
+.eggs/
+*.manifest
+*.spec
+
+# ─── Entornos virtuales ──────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ─── Jupyter ─────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# ─── Editores / IDEs ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+
+# ─── Sistema operativo ───────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── Salidas generadas por Circuito_cuantico.py ──────────────
+# (Resultados de cada ejecución — no se versionan)
+vqr_*.log
+vqr7q_layers_summary.csv
+vqr7q_cv_detail.csv
+vqr7q_predictions.csv
+fig_*.png
+fig_*.pdf
+
+# ─── Otros logs y temporales ─────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.cache
+
+# ─── NO ignorar los datasets de entrada ──────────────────────
+# (combined_data_with_redshift_V8.csv y LGRBs_limpio_def.csv
+#  SÍ deben subirse al repo — están explícitamente fuera de los
+#  patrones de exclusión de arriba).
